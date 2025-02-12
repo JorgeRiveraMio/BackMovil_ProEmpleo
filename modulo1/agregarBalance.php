@@ -24,23 +24,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
-    // Preparar consulta
-    $stmt = $conexion->prepare("INSERT INTO balance (categoria, cambio, explicacion, id_usuario) VALUES (?, ?, ?, ?)");
-    if ($stmt) {
+    // ✅ Verificar si ya existe un registro con el mismo id_usuario y categoria
+    $stmt = $conexion->prepare("SELECT id FROM balance WHERE id_usuario = ? AND categoria = ?");
+    $stmt->bind_param("is", $usuario_id, $categoria);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        // Si existe, actualizar el registro
+        $stmt->close();
+        $stmt = $conexion->prepare("UPDATE balance SET cambio = ?, explicacion = ? WHERE id_usuario = ? AND categoria = ?");
+        $stmt->bind_param("ssis", $cambio, $explicacion, $usuario_id, $categoria);
+
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true, "message" => "Registro actualizado correctamente."]);
+        } else {
+            echo json_encode(["success" => false, "message" => "Error al actualizar: " . $stmt->error]);
+        }
+    } else {
+        // Si no existe, insertar un nuevo registro
+        $stmt->close();
+        $stmt = $conexion->prepare("INSERT INTO balance (categoria, cambio, explicacion, id_usuario) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("sssi", $categoria, $cambio, $explicacion, $usuario_id);
 
-        // Ejecutar consulta
         if ($stmt->execute()) {
             echo json_encode(["success" => true, "message" => "Datos registrados correctamente."]);
         } else {
             echo json_encode(["success" => false, "message" => "Error al registrar: " . $stmt->error]);
         }
-
-        $stmt->close(); // Cerrar statement
-    } else {
-        echo json_encode(["success" => false, "message" => "Error en la preparación de la consulta."]);
     }
 
+    $stmt->close(); // Cerrar statement
     mysqli_close($conexion); // Cerrar conexión
 } else {
     echo json_encode(["success" => false, "message" => "Método no permitido."]);
