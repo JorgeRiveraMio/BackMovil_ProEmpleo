@@ -1,0 +1,7 @@
+{"autoestima":"1","autorespeto":"2","autoaceptacion":"3","autovaloracion":"4","autoconcepto":"5","autoconocimiento":"6","usuario_id":26}
+{"autoestima":"1","autorespeto":"2","autoaceptacion":"3","autovaloracion":"4","autoconcepto":"5","autoconocimiento":"6","usuario_id":26}
+{"autoestima":"1","autorespeto":"2","autoaceptacion":"3","autovaloracion":"4","autoconcepto":"56","autoconocimiento":"6","usuario_id":26}
+{"autoestima":"1","autorespeto":"2","autoaceptacion":"3","autovaloracion":"4","autoconcepto":"56","autoconocimiento":"6","usuario_id":26}
+{"autoestima":"1","autorespeto":"2","autoaceptacion":"3","autovaloracion":"4","autoconcepto":"5","autoconocimiento":"6","usuario_id":26}
+{"autoestima":"1","autorespeto":"2","autoaceptacion":"3","autovaloracion":"4","autoconcepto":"5","autoconocimiento":"6","usuario_id":26}
+{"autoestima":"1","autorespeto":"2","autoaceptacion":"3","autovaloracion":"4","autoconcepto":"5","autoconocimiento":"7","usuario_id":26}
