@@ -2,7 +2,7 @@
 // Configuración de errores y buffer
 ini_set('display_errors', 0); // Evita mostrar errores en la respuesta JSON
 ini_set('log_errors', 1);
-ini_set('error_log', 'error_log.txt');
+// ini_set('error_log', 'error_log.txt');
 
 error_reporting(E_ALL);
 header("Content-Type: application/json");
@@ -18,7 +18,7 @@ include '../conexion.php';
 
 // Leer el JSON recibido
 $inputJSON = file_get_contents("php://input");
-file_put_contents("debug_log.txt", $inputJSON . PHP_EOL, FILE_APPEND);
+// file_put_contents("debug_log.txt", $inputJSON . PHP_EOL, FILE_APPEND);
 
 $data = json_decode($inputJSON, true);
 

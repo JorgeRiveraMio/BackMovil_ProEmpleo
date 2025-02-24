@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute();
     $stmt->store_result();
 
-    if ($stmt->num_rows > 0) {
+    if ($stmt->num_rows > 1) {
         // Si existe, actualizar el registro
         $stmt->close();
         $stmt = $conexion->prepare("UPDATE balance SET cambio = ?, explicacion = ? WHERE id_usuario = ? AND categoria = ?");
