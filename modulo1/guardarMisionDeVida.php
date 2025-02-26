@@ -1,13 +1,18 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+error_log("Error en el script PHP", 0);
+
 header("Content-Type: application/json; charset=UTF-8"); // Forzar JSON
 
 // Verificar si la solicitud es POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Incluir archivo de conexión a la base de datos
-    include 'conexion.php'; 
+    include '../conexion.php';
+ 
 
     // Verificar que la conexión existe
     if (!$conexion) {
