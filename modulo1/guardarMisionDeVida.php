@@ -1,7 +1,6 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 error_log("Error en el script PHP", 0);
 
@@ -19,43 +18,64 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo json_encode(["success" => false, "message" => "Error de conexión a la base de datos"]);
         exit;
     }
+    // Leer el JSON recibido
+    $inputJSON = file_get_contents("php://input");
+    // file_put_contents("debug_log.txt", $inputJSON . PHP_EOL, FILE_APPEND);
+
+    $data = json_decode($inputJSON, true);
+
+    // Validar si el JSON es válido
+    if (!$data) {
+        echo json_encode(["success" => false, "message" => "Datos JSON inválidos."]);
+        exit;
+    }
+
 
     // Obtener los datos enviados en la solicitud POST
-    $a_que_se_dedica = $_POST['a_que_se_dedica'] ?? '';
-    $que_quiere_alcanzar = $_POST['que_quiere_alcanzar'] ?? '';
-    $breves_ideas= $_POST['breves_ideas'] ?? '';
-    $resumen = $_POST['resumen'] ?? '';
+    $a_que_se_dedica = $data['a_que_se_dedica'] ?? '';
+    $que_quiere_alcanzar = $data['que_quiere_alcanzar'] ?? '';
+    $breves_ideas= $data['breves_ideas'] ?? '';
+    $resumen = $data['resumen'] ?? '';
+    $usuario_id  = $data['usuario_id'] ?? '';
 
     // Verificar si los valores no están vacíos
-    if (empty($a_que_se_dedica) || empty($que_quiere_alcanzar) || empty($breves_ideas) || empty($resumen)) {
+    if (empty($a_que_se_dedica) || empty($que_quiere_alcanzar) || empty($breves_ideas) || empty($resumen)|| empty($usuario_id)) {
         echo json_encode(["success" => false, "message" => "Faltan datos en la solicitud"]);
         exit;
     }
 
-    // Verificar si se proporciona un ID en la solicitud (para actualización)
-    if (isset($_POST['id'])) {
-        $id = intval($_POST['id']);
-        $query = "UPDATE mision_vida SET a_que_se_dedica=?, que_quiere_alcanzar=?, breves_ideas=?, resumen=? WHERE id=?";
-        $stmt = $conexion->prepare($query);
-        $stmt->bind_param("ssssi", $a_que_se_dedica, $que_quiere_alcanzar, $breves_ideas, $resumen, $id);
+
+       // Verificar si ya existe el registro
+       $stmt = $conexion->prepare("SELECT id FROM mision_vida WHERE usuario_id = ?");
+       $stmt->bind_param("i", $usuario_id);
+       $stmt->execute();
+       $stmt->store_result();
+
+
+       if ($stmt->num_rows > 0) {
+        $stmt->close();
+        // Actualizar registro existente
+        $stmt = $conexion->prepare("UPDATE mision_vida SET a_que_se_dedica = ?, que_quiere_alcanzar = ?, breves_ideas = ?, resumen_ = ? WHERE usuario_id = ?");
+        $stmt->bind_param("ssssi", $a_que_se_dedica, $que_quiere_alcanzar, $breves_ideas, $resumen,  $usuario_id);
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true, "message" => "Registro actualizado correctamente."]);
+        } else {
+            echo json_encode(["success" => false, "message" => "Error al actualizar: " . $stmt->error]);
+        }
     } else {
-        $query = "INSERT INTO mision_vida (a_que_se_dedica, que_quiere_alcanzar, breves_ideas, resumen) VALUES (?, ?, ?, ?)";
-        $stmt = $conexion->prepare($query);
-        $stmt->bind_param("ssss", $a_que_se_dedica, $que_quiere_alcanzar, $breves_ideas, $resumen);
+        // Insertar nuevo registro
+        $stmt = $conexion->prepare("INSERT INTO mision_vida (usuario_id, a_que_se_dedica, que_quiere_alcanzar, breves_ideas, resumen_) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("issss", $usuario_id, $a_que_se_dedica, $que_quiere_alcanzar, $breves_ideas, $resumen);
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true, "message" => "Datos registrados correctamente."]);
+        } else {
+            echo json_encode(["success" => false, "message" => "Error en la consulta: " . $stmt->error]);
+        }
     }
 
-    // Ejecutar la consulta
-    if ($stmt->execute()) {
-        $response = ["success" => true, "message" => "Datos guardados correctamente"];
-    } else {
-        $response = ["success" => false, "message" => "Error en la consulta: " . $stmt->error];
-    }
-
-    // Cerrar la conexión
     $stmt->close();
-    $conexion->close();
-
-    // Enviar respuesta JSON
-    echo json_encode($response);
+    mysqli_close($conexion);
+} else {
+    echo json_encode(["success" => false, "message" => "Método no permitido."]);
 }
 ?>
