@@ -18,8 +18,6 @@ include '../conexion.php';
 
 // Leer el JSON recibido
 $inputJSON = file_get_contents("php://input");
-// file_put_contents("debug_log.txt", $inputJSON . PHP_EOL, FILE_APPEND);
-
 $data = json_decode($inputJSON, true);
 
 // Validar si el JSON es válido
