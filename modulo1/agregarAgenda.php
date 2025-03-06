@@ -26,13 +26,13 @@
         exit;
     }   
     // Verificar si el usuario ya tiene un registro
-        $stmt = $conexion->prepare("SELECT id FROM agenda WHERE usuario_id  = ?");
+        $stmt = $conexion->prepare("SELECT id FROM agenda WHERE usuario_id  = ? AND dia=?");
         if (!$stmt) {
             echo json_encode(["success" => false, "message" => "Error en la consulta: " . $conexion->error]);
             exit;
         }
 
-        $stmt->bind_param("i", $usuario_id);
+        $stmt->bind_param("is", $usuario_id, $dia);
         $stmt->execute();
         $stmt->store_result();
 
